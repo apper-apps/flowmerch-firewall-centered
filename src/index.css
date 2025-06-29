@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import 'react-toastify/dist/ReactToastify.css';
+
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: #374151;
+    background-color: #FAFBFC;
+  }
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+}
+
+@layer components {
+  .table-row-hover {
+    @apply hover:bg-gray-50 transition-colors duration-150;
+  }
+  
+  .table-zebra {
+    @apply odd:bg-white even:bg-gray-50;
+  }
+  
+  .status-dot {
+    @apply inline-block w-2 h-2 rounded-full;
+  }
+  
+  .btn-primary {
+    @apply bg-primary text-white px-4 py-2 rounded text-sm font-medium hover:bg-primary/90 transition-colors duration-150;
+  }
+  
+  .btn-secondary {
+    @apply border border-gray-300 text-gray-700 px-4 py-2 rounded text-sm font-medium hover:bg-gray-50 transition-colors duration-150;
+  }
+  
+  .card {
+    @apply bg-white border border-gray-200 rounded-lg;
+  }
+  
+  .form-field {
+    @apply border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary;
+  }
+}
+
+.Toastify__toast-container {
+  width: 360px;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.Toastify__toast {
+  border-radius: 8px;
+  padding: 12px 16px;
+  min-height: auto;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.Toastify__toast--success {
+  background-color: #50B83C;
+}
+
+.Toastify__toast--error {
+  background-color: #DE3618;
+}
+
+.Toastify__toast--warning {
+  background-color: #F49342;
+}
+
+.Toastify__toast--info {
+  background-color: #5C6AC4;
+}
+
+.Toastify__progress-bar {
+  background: rgba(255, 255, 255, 0.7);
+}
