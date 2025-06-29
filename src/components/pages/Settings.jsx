@@ -31,7 +31,7 @@ const Settings = () => {
     try {
       setLoading(true)
       setError('')
-      const data = await settingsService.getSettings()
+const data = await settingsService.getSettings()
       setSettings(data)
     } catch (err) {
       setError('Failed to load settings. Please try again.')
@@ -44,7 +44,7 @@ const Settings = () => {
   const updateSettings = async (section, updates) => {
     try {
       setSaving(true)
-      const updatedSettings = await settingsService.updateSettings(section, updates)
+const updatedSettings = await settingsService.updateSettings(section, updates)
       setSettings(updatedSettings)
       toast.success('Settings updated successfully')
     } catch (err) {

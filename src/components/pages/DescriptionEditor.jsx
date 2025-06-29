@@ -149,8 +149,8 @@ const applyTemplate = (template) => {
                 {products.map(product => <button
                     key={product.Id}
                     onClick={() => selectProduct(product)}
-                    className={`w-full p-4 text-left hover:bg-gray-50 border-b border-gray-100 transition-colors ${selectedProduct?.Id === product.Id ? "bg-primary/5 border-primary/20" : ""}`}>
-                    <p className="font-medium text-gray-900 truncate">{product.name}</p>
+className={`w-full p-4 text-left hover:bg-gray-50 border-b border-gray-100 transition-colors ${selectedProduct?.Id === product.Id ? "bg-primary/5 border-primary/20" : ""}`}>
+                    <p className="font-medium text-gray-900 truncate">{product.Name}</p>
                     <p className="text-sm text-gray-500 truncate">ID: {product.shopify_id}</p>
                 </button>)}
             </div>
@@ -161,8 +161,8 @@ const applyTemplate = (template) => {
                 {/* Editor Header */}
                 <div className="p-4 border-b border-gray-200">
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="font-semibold text-gray-900">
-                            {selectedProduct ? selectedProduct.name : "Select a Product"}
+<h2 className="font-semibold text-gray-900">
+                            {selectedProduct ? selectedProduct.Name : "Select a Product"}
                         </h2>
                         <div className="flex items-center gap-2">
                             <Button
@@ -243,8 +243,8 @@ const applyTemplate = (template) => {
                         scale: 1.02
                     }}
                     className="p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-primary/30 hover:bg-primary/5 transition-colors"
-                    onClick={() => applyTemplate(template)}>
-                    <h3 className="font-medium text-gray-900 mb-1">{template.name}</h3>
+onClick={() => applyTemplate(template)}>
+                    <h3 className="font-medium text-gray-900 mb-1">{template.Name}</h3>
                     <p className="text-sm text-gray-600">{template.description}</p>
                     <div className="flex items-center justify-between mt-2">
                         <span className="text-xs text-gray-500">{template.category}</span>

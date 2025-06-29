@@ -1,15 +1,16 @@
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import ApperIcon from '@/components/ApperIcon'
-import Button from '@/components/atoms/Button'
-import Badge from '@/components/atoms/Badge'
-import StatusDot from '@/components/atoms/StatusDot'
-import Loading from '@/components/ui/Loading'
-import Error from '@/components/ui/Error'
-import Empty from '@/components/ui/Empty'
-import * as syncService from '@/services/api/syncService'
-import { toast } from 'react-toastify'
-import { format } from 'date-fns'
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { toast } from "react-toastify";
+import { format } from "date-fns";
+import ApperIcon from "@/components/ApperIcon";
+import Products from "@/components/pages/Products";
+import StatusDot from "@/components/atoms/StatusDot";
+import Badge from "@/components/atoms/Badge";
+import Button from "@/components/atoms/Button";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Loading from "@/components/ui/Loading";
+import * as syncService from "@/services/api/syncService";
 
 const SyncManager = () => {
   const [conflicts, setConflicts] = useState([])
@@ -150,7 +151,7 @@ const SyncManager = () => {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-3">
-                      <h3 className="text-lg font-medium text-gray-900">
+<h3 className="text-lg font-medium text-gray-900">
                         {conflict.product_name}
                       </h3>
                       <Badge variant="warning">Conflict</Badge>
@@ -213,7 +214,7 @@ const SyncManager = () => {
         </div>
         
         <div className="divide-y divide-gray-200">
-          {syncHistory.map((sync, index) => (
+{syncHistory.map((sync, index) => (
             <motion.div
               key={sync.Id}
               initial={{ opacity: 0, x: -20 }}

@@ -1,16 +1,17 @@
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import ApperIcon from '@/components/ApperIcon'
-import Button from '@/components/atoms/Button'
-import Input from '@/components/atoms/Input'
-import Badge from '@/components/atoms/Badge'
-import SearchBar from '@/components/molecules/SearchBar'
-import Loading from '@/components/ui/Loading'
-import Error from '@/components/ui/Error'
-import Empty from '@/components/ui/Empty'
-import * as bundleService from '@/services/api/bundleService'
-import * as productService from '@/services/api/productService'
-import { toast } from 'react-toastify'
+import React, { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { toast } from "react-toastify";
+import ApperIcon from "@/components/ApperIcon";
+import Products from "@/components/pages/Products";
+import Badge from "@/components/atoms/Badge";
+import Input from "@/components/atoms/Input";
+import Button from "@/components/atoms/Button";
+import SearchBar from "@/components/molecules/SearchBar";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Loading from "@/components/ui/Loading";
+import * as bundleService from "@/services/api/bundleService";
+import * as productService from "@/services/api/productService";
 
 const BundleManager = () => {
   const [bundles, setBundles] = useState([])
@@ -186,8 +187,8 @@ const BundleManager = () => {
               transition={{ delay: index * 0.1 }}
               className="card p-6"
             >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">{bundle.name}</h3>
+<div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">{bundle.Name}</h3>
                 <Badge variant={bundle.active ? 'success' : 'default'}>
                   {bundle.active ? 'Active' : 'Inactive'}
                 </Badge>
@@ -195,13 +196,13 @@ const BundleManager = () => {
               
               <div className="space-y-3 mb-4">
                 {bundle.products.slice(0, 3).map((product) => (
-                  <div key={product.Id} className="flex items-center space-x-3">
+<div key={product.Id} className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
                       <ApperIcon name="Package" className="h-5 w-5 text-gray-600" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">
-                        {product.name}
+                        {product.Name || product.name}
                       </p>
                       <p className="text-xs text-gray-500">
                         Qty: {product.quantity} × {formatCurrency(product.price)}

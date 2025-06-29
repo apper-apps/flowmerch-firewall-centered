@@ -1,166 +1,227 @@
 const delay = () => new Promise(resolve => setTimeout(resolve, 350))
 
-const mockProducts = [
-  {
-    Id: 1,
-    shopify_id: 'prod_123456789',
-    name: 'Wireless Bluetooth Headphones',
-    description_html: '<p>Premium wireless headphones with noise cancellation</p>',
-    msrp: 199.99,
-    cost: 89.50,
-    price: 149.99,
-    inventory: 45,
-    last_synced: '2024-01-15T10:30:00Z',
-    sync_status: 'synced',
-    image_urls: [
-      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=600&h=400&fit=crop'
-    ]
-  },
-{
-    Id: 2,
-    shopify_id: 'prod_987654321',
-    name: 'Smart Fitness Watch',
-    description_html: '<p>Track your fitness with advanced health monitoring</p>',
-    msrp: 299.99,
-    cost: 145.00,
-    price: 249.99,
-    inventory: 8,
-    last_synced: '2024-01-15T09:45:00Z',
-    sync_status: 'conflict',
-    image_urls: [
-      'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=400&h=400&fit=crop'
-    ]
-  },
-{
-    Id: 3,
-    shopify_id: 'prod_456789123',
-    name: 'Portable Power Bank',
-    description_html: '<p>High-capacity power bank for all devices</p>',
-    msrp: 79.99,
-    cost: 35.00,
-    price: 59.99,
-    inventory: 123,
-    last_synced: '1/15/2024 11:15:00 AMZ',
-    sync_status: 'synced',
-    image_urls: [
-      'https://images.unsplash.com/photo-1609592020508-9e54b0c4b30b?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1552702042-f8fd29f0e4b8?w=400&h=400&fit=crop'
-    ]
-  },
-{
-    Id: 4,
-    shopify_id: 'prod_789123456',
-    name: 'Wireless Charging Pad',
-    description_html: '<p>Fast wireless charging for compatible devices</p>',
-    msrp: 49.99,
-    cost: 22.50,
-    price: 39.99,
-    inventory: 67,
-    last_synced: null,
-    sync_status: 'pending',
-    image_urls: [
-      'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=800&h=600&fit=crop'
-    ]
-  },
-{
-    Id: 5,
-    shopify_id: 'prod_321654987',
-    name: 'Bluetooth Speaker',
-    description_html: '<p>Portable speaker with rich, room-filling sound</p>',
-    msrp: 129.99,
-    cost: 58.00,
-    price: 99.99,
-    inventory: 2,
-    last_synced: '2024-01-15T08:20:00Z',
-    sync_status: 'error',
-    image_urls: [
-      'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1545454675-3531b543be5d?w=400&h=400&fit=crop'
-    ]
-  },
-{
-    Id: 6,
-    shopify_id: 'prod_654987321',
-    name: 'USB-C Hub',
-    description_html: '<p>Multi-port hub for modern laptops</p>',
-    msrp: 89.99,
-    cost: 41.00,
-    price: 69.99,
-    inventory: 89,
-    last_synced: '2024-01-15T10:45:00Z',
-    sync_status: 'synced',
-    image_urls: [
-      'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=800&h=600&fit=crop'
-    ]
-  }
-]
-
-let products = [...mockProducts]
+// Initialize ApperClient
+const getApperClient = () => {
+  const { ApperClient } = window.ApperSDK
+  return new ApperClient({
+    apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+    apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+  })
+}
 
 export const getAll = async () => {
-  await delay()
-  return [...products]
+  try {
+    await delay()
+    const apperClient = getApperClient()
+    
+    const params = {
+      fields: [
+        { field: { Name: "Name" } },
+        { field: { Name: "Tags" } },
+        { field: { Name: "Owner" } },
+        { field: { Name: "shopify_id" } },
+        { field: { Name: "description_html" } },
+        { field: { Name: "msrp" } },
+        { field: { Name: "cost" } },
+        { field: { Name: "price" } },
+        { field: { Name: "inventory" } },
+        { field: { Name: "last_synced" } },
+        { field: { Name: "sync_status" } },
+        { field: { Name: "image_urls" } }
+      ],
+      orderBy: [{ fieldName: "Name", sorttype: "ASC" }],
+      pagingInfo: { limit: 100, offset: 0 }
+    }
+    
+    const response = await apperClient.fetchRecords('product', params)
+    
+    if (!response.success) {
+      console.error(response.message)
+      throw new Error(response.message)
+    }
+    
+    return response.data || []
+  } catch (error) {
+    console.error('Error fetching products:', error)
+    throw error
+  }
 }
 
 export const getById = async (id) => {
-  await delay()
-  const product = products.find(p => p.Id === parseInt(id))
-  if (!product) {
-    throw new Error('Product not found')
+  try {
+    await delay()
+    const apperClient = getApperClient()
+    
+    const params = {
+      fields: [
+        { field: { Name: "Name" } },
+        { field: { Name: "Tags" } },
+        { field: { Name: "Owner" } },
+        { field: { Name: "shopify_id" } },
+        { field: { Name: "description_html" } },
+        { field: { Name: "msrp" } },
+        { field: { Name: "cost" } },
+        { field: { Name: "price" } },
+        { field: { Name: "inventory" } },
+        { field: { Name: "last_synced" } },
+        { field: { Name: "sync_status" } },
+        { field: { Name: "image_urls" } }
+      ]
+    }
+    
+    const response = await apperClient.getRecordById('product', parseInt(id), params)
+    
+    if (!response.success) {
+      console.error(response.message)
+      throw new Error(response.message)
+    }
+    
+    return response.data
+  } catch (error) {
+    console.error(`Error fetching product ${id}:`, error)
+    throw error
   }
-  return { ...product }
 }
 
 export const create = async (productData) => {
-  await delay()
-  const newProduct = {
-    ...productData,
-    Id: Math.max(...products.map(p => p.Id)) + 1,
-    last_synced: new Date().toISOString(),
-    sync_status: 'synced'
+  try {
+    await delay()
+    const apperClient = getApperClient()
+    
+    // Only include Updateable fields
+    const filteredData = {
+      Name: productData.Name,
+      Tags: productData.Tags,
+      Owner: parseInt(productData.Owner),
+      shopify_id: productData.shopify_id,
+      description_html: productData.description_html,
+      msrp: parseFloat(productData.msrp),
+      cost: parseFloat(productData.cost),
+      price: parseFloat(productData.price),
+      inventory: parseInt(productData.inventory),
+      last_synced: productData.last_synced,
+      sync_status: productData.sync_status,
+      image_urls: productData.image_urls
+    }
+    
+    const params = { records: [filteredData] }
+    const response = await apperClient.createRecord('product', params)
+    
+    if (!response.success) {
+      console.error(response.message)
+      throw new Error(response.message)
+    }
+    
+    if (response.results) {
+      const successfulRecords = response.results.filter(result => result.success)
+      const failedRecords = response.results.filter(result => !result.success)
+      
+      if (failedRecords.length > 0) {
+        console.error(`Failed to create ${failedRecords.length} records:${JSON.stringify(failedRecords)}`)
+        throw new Error('Some records failed to create')
+      }
+      
+      return successfulRecords[0]?.data
+    }
+  } catch (error) {
+    console.error('Error creating product:', error)
+    throw error
   }
-  products.push(newProduct)
-  return { ...newProduct }
 }
 
 export const update = async (id, updates) => {
-  await delay()
-  const index = products.findIndex(p => p.Id === parseInt(id))
-  if (index === -1) {
-    throw new Error('Product not found')
+  try {
+    await delay()
+    const apperClient = getApperClient()
+    
+    // Only include Updateable fields
+    const filteredUpdates = {
+      Id: parseInt(id),
+      ...(updates.Name && { Name: updates.Name }),
+      ...(updates.Tags && { Tags: updates.Tags }),
+      ...(updates.Owner && { Owner: parseInt(updates.Owner) }),
+      ...(updates.shopify_id && { shopify_id: updates.shopify_id }),
+      ...(updates.description_html !== undefined && { description_html: updates.description_html }),
+      ...(updates.msrp && { msrp: parseFloat(updates.msrp) }),
+      ...(updates.cost && { cost: parseFloat(updates.cost) }),
+      ...(updates.price && { price: parseFloat(updates.price) }),
+      ...(updates.inventory !== undefined && { inventory: parseInt(updates.inventory) }),
+      ...(updates.last_synced && { last_synced: updates.last_synced }),
+      ...(updates.sync_status && { sync_status: updates.sync_status }),
+      ...(updates.image_urls && { image_urls: updates.image_urls })
+    }
+    
+    const params = { records: [filteredUpdates] }
+    const response = await apperClient.updateRecord('product', params)
+    
+    if (!response.success) {
+      console.error(response.message)
+      throw new Error(response.message)
+    }
+    
+    if (response.results) {
+      const successfulRecords = response.results.filter(result => result.success)
+      const failedRecords = response.results.filter(result => !result.success)
+      
+      if (failedRecords.length > 0) {
+        console.error(`Failed to update ${failedRecords.length} records:${JSON.stringify(failedRecords)}`)
+        throw new Error('Some records failed to update')
+      }
+      
+      return successfulRecords[0]?.data
+    }
+  } catch (error) {
+    console.error('Error updating product:', error)
+    throw error
   }
-  
-  products[index] = {
-    ...products[index],
-    ...updates,
-    last_synced: new Date().toISOString()
-  }
-  
-  return { ...products[index] }
 }
 
 export const delete_ = async (id) => {
-  await delay()
-  const index = products.findIndex(p => p.Id === parseInt(id))
-  if (index === -1) {
-    throw new Error('Product not found')
+  try {
+    await delay()
+    const apperClient = getApperClient()
+    
+    const params = { RecordIds: [parseInt(id)] }
+    const response = await apperClient.deleteRecord('product', params)
+    
+    if (!response.success) {
+      console.error(response.message)
+      throw new Error(response.message)
+    }
+    
+    return { success: true }
+  } catch (error) {
+    console.error('Error deleting product:', error)
+    throw error
   }
-  
-  products.splice(index, 1)
-  return { success: true }
 }
 
 export const bulkSync = async (productIds) => {
-  await delay()
-  productIds.forEach(id => {
-    const index = products.findIndex(p => p.Id === parseInt(id))
-    if (index !== -1) {
-      products[index].last_synced = new Date().toISOString()
-      products[index].sync_status = 'synced'
+  try {
+    await delay()
+    const apperClient = getApperClient()
+    
+    // Update sync status for multiple products
+    const records = productIds.map(id => ({
+      Id: parseInt(id),
+      last_synced: new Date().toISOString(),
+      sync_status: 'synced'
+    }))
+    
+    const params = { records }
+    const response = await apperClient.updateRecord('product', params)
+    
+    if (!response.success) {
+      console.error(response.message)
+      throw new Error(response.message)
     }
-  })
-  return { success: true, synced: productIds.length }
+    
+    return { success: true, synced: productIds.length }
+  } catch (error) {
+    console.error('Error bulk syncing products:', error)
+    throw error
+  }
 }
+
+// Export as 'delete' for convenience
+export { delete_ as delete }

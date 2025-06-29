@@ -70,7 +70,7 @@ const Collections = () => {
   
   const updateCollection = async (collectionId, updates) => {
     try {
-      const updatedCollection = await collectionService.update(collectionId, updates)
+const updatedCollection = await collectionService.update(collectionId, updates)
       setCollections(prev => prev.map(c => c.Id === collectionId ? updatedCollection : c))
       toast.success('Collection updated successfully')
     } catch (err) {
@@ -199,8 +199,8 @@ const Collections = () => {
               transition={{ delay: index * 0.1 }}
               className="card p-6"
             >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">{collection.name}</h3>
+<div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">{collection.Name}</h3>
                 <div className="flex items-center space-x-2">
                   <Badge variant={collection.active ? 'success' : 'default'}>
                     {collection.active ? 'Active' : 'Inactive'}

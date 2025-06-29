@@ -333,8 +333,8 @@ const WidgetBuilder = () => {
             <div className="divide-y divide-gray-200">
               {widgets.map((widget) => (
                 <div key={widget.Id} className="p-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium text-gray-900">{widget.name || widget.type}</h3>
+<div className="flex items-center justify-between mb-2">
+                    <h3 className="font-medium text-gray-900">{widget.Name || widget.name || widget.type}</h3>
                     <div className="flex items-center space-x-2">
                       <Badge variant={widget.active ? 'success' : 'default'}>
                         {widget.active ? 'Active' : 'Inactive'}

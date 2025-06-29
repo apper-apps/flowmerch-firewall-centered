@@ -22,7 +22,7 @@ const Dashboard = () => {
     try {
       setLoading(true)
       setError('')
-      const [statsData, activityData] = await Promise.all([
+const [statsData, activityData] = await Promise.all([
         dashboardService.getStats(),
         dashboardService.getRecentActivity()
       ])

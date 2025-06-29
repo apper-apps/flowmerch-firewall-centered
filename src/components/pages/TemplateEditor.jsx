@@ -317,30 +317,30 @@ const TemplateEditor = () => {
                     }`}
                   >
                     <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-gray-900">{template.name}</h4>
+<div className="flex-1">
+                        <h4 className="font-medium text-gray-900">{template.Name}</h4>
                         <p className="text-sm text-gray-600 mt-1">{template.description}</p>
                         <div className="flex items-center gap-2 mt-2">
-                          <Badge variant={template.category === 'product' ? 'primary' : 'secondary'}>
+<Badge variant={template.category === 'product' ? 'primary' : 'secondary'}>
                             {template.category}
-                          </Badge>
-                          <Badge variant={template.isActive ? 'success' : 'warning'}>
-                            {template.isActive ? 'Active' : 'Inactive'}
+</Badge>
+                          <Badge variant={template.is_active ? 'success' : 'warning'}>
+                            {template.is_active ? 'Active' : 'Inactive'}
                           </Badge>
                         </div>
                       </div>
                       <div className="flex gap-1">
                         <button
                           onClick={(e) => {
-                            e.stopPropagation()
-                            handleToggleActive(template.Id, template.isActive)
+e.stopPropagation()
+                            handleToggleActive(template.Id, template.is_active)
                           }}
                           className="p-1 hover:bg-gray-100 rounded"
                         >
                           <ApperIcon 
-                            name={template.isActive ? 'Eye' : 'EyeOff'} 
+name={template.is_active ? 'Eye' : 'EyeOff'} 
                             size={14}
-                            className={template.isActive ? 'text-success' : 'text-gray-400'}
+                            className={template.is_active ? 'text-success' : 'text-gray-400'}
                           />
                         </button>
                         <button

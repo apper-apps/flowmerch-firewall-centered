@@ -3,136 +3,210 @@ import { convert } from 'html-to-text'
 
 const delay = () => new Promise(resolve => setTimeout(resolve, 300))
 
-const mockProducts = [
-  {
-    Id: 1,
-    shopify_id: 'prod_123456789',
-    name: 'Wireless Bluetooth Headphones',
-    description_html: '<div class="product-description"><h3>Premium Audio Experience</h3><p>Experience crystal-clear sound with our premium wireless headphones featuring advanced noise cancellation technology.</p><ul><li>Active noise cancellation</li><li>30-hour battery life</li><li>Quick charge technology</li><li>Premium comfort padding</li></ul></div>'
-  },
-  {
-    Id: 2,
-    shopify_id: 'prod_987654321',
-    name: 'Smart Fitness Watch',
-    description_html: '<div class="product-description"><h3>Your Health Companion</h3><p>Track your fitness journey with advanced health monitoring and smart notifications.</p></div>'
-  },
-  {
-    Id: 3,
-    shopify_id: 'prod_456789123',
-    name: 'Portable Power Bank',
-    description_html: '<div class="product-description"><h3>Power On The Go</h3><p>Never run out of battery with our high-capacity portable power bank.</p></div>'
-  },
-  {
-    Id: 4,
-    shopify_id: 'prod_789123456',
-    name: 'Wireless Charging Pad',
-    description_html: ''
-  },
-  {
-    Id: 5,
-    shopify_id: 'prod_321654987',
-    name: 'Bluetooth Speaker',
-    description_html: ''
-  }
-]
-
-const mockTemplates = [
-  {
-    Id: 1,
-    name: 'Electronics Template',
-    description: 'Professional template for electronic products',
-    category: 'Electronics',
-    content: '<div class="product-description"><h3>Premium Quality Electronics</h3><p>[PRODUCT_NAME] delivers exceptional performance and reliability.</p><h4>Key Features:</h4><ul><li>Feature 1</li><li>Feature 2</li><li>Feature 3</li></ul><h4>Specifications:</h4><p>Add your product specifications here.</p></div>',
-    llm_prompt: 'Create a compelling product description for [PRODUCT_NAME], an electronic device. Focus on technical benefits, key features, and value proposition. Use the product images [IMAGES] to highlight visual appeal. Structure the content with clear headings, bullet points for features, and persuasive language that converts browsers to buyers. Include specifications section.'
-  },
-  {
-    Id: 2,
-    name: 'Fashion Template',
-    description: 'Stylish template for fashion items',
-    category: 'Fashion',
-    content: '<div class="product-description"><h3>Style Meets Comfort</h3><p>Discover the perfect blend of style and comfort with [PRODUCT_NAME].</p><h4>Features:</h4><ul><li>Premium materials</li><li>Modern design</li><li>Perfect fit</li></ul></div>',
-    llm_prompt: 'Write an engaging product description for [PRODUCT_NAME], a fashion item. Emphasize style, comfort, quality materials, and how it makes the customer feel. Reference the product images [IMAGES] to describe visual details, colors, and styling options. Use emotional language that creates desire and urgency. Include care instructions and sizing information.'
-  },
-  {
-    Id: 3,
-    name: 'Home & Garden Template',
-    description: 'Perfect for home and garden products',
-    category: 'Home & Garden',
-    content: '<div class="product-description"><h3>Transform Your Space</h3><p>Enhance your home with [PRODUCT_NAME].</p><h4>Benefits:</h4><ul><li>Easy to use</li><li>Durable construction</li><li>Great value</li></ul></div>',
-    llm_prompt: 'Create a persuasive description for [PRODUCT_NAME], a home and garden product. Focus on how it transforms living spaces, adds value to the home, and improves daily life. Use the product images [IMAGES] to describe installation, usage scenarios, and visual impact. Include practical benefits, durability features, and easy maintenance. Appeal to homeowners\' desire for improvement and comfort.'
-  },
-  {
-    Id: 4,
-    name: 'High-Converting Sales Page',
-    description: 'Maximum conversion sales page template',
-    category: 'Sales',
-    content: '<div class="product-description"><h2>🔥 LIMITED TIME OFFER</h2><h3>[PRODUCT_NAME] - The Solution You\'ve Been Waiting For</h3><p><strong>Stop struggling with [PROBLEM]. Start succeeding with [PRODUCT_NAME].</strong></p><h4>✅ What You Get:</h4><ul><li>Benefit 1</li><li>Benefit 2</li><li>Benefit 3</li></ul><h4>💯 Why Choose Us:</h4><p>Social proof and guarantees here.</p></div>',
-    llm_prompt: 'Write a high-converting sales page description for [PRODUCT_NAME]. Use psychological triggers like scarcity, social proof, and urgency. Structure with: attention-grabbing headline, problem identification, solution presentation, clear benefits (not just features), social proof, risk reversal, and strong call-to-action. Reference product images [IMAGES] to build desire. Use power words, bullet points, and emotional language that compels immediate action. Include guarantees and address common objections.'
-  },
-  {
-    Id: 5,
-    name: 'Luxury Premium Template',
-    description: 'Sophisticated template for premium products',
-    category: 'Luxury',
-    content: '<div class="product-description"><h3>Exquisite Craftsmanship</h3><p>[PRODUCT_NAME] represents the pinnacle of luxury and sophistication.</p><h4>Distinguished Features:</h4><ul><li>Premium materials</li><li>Artisan craftsmanship</li><li>Exclusive design</li></ul></div>',
-    llm_prompt: 'Craft an elegant, sophisticated description for [PRODUCT_NAME], a luxury product. Emphasize exclusivity, premium materials, superior craftsmanship, and heritage. Use the product images [IMAGES] to highlight fine details, quality construction, and luxurious presentation. Write with refined language that appeals to discerning customers who value quality over price. Include story elements about craftsmanship and attention to detail.'
-  }
-]
-
-let products = [...mockProducts]
-let templates = [...mockTemplates]
+// Initialize ApperClient
+const getApperClient = () => {
+  const { ApperClient } = window.ApperSDK
+  return new ApperClient({
+    apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+    apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+  })
+}
 
 export const getProducts = async () => {
-  await delay()
-  return [...products]
+  try {
+    await delay()
+    const apperClient = getApperClient()
+    
+    const params = {
+      fields: [
+        { field: { Name: "Name" } },
+        { field: { Name: "shopify_id" } },
+        { field: { Name: "description_html" } },
+        { field: { Name: "price" } },
+        { field: { Name: "msrp" } },
+        { field: { Name: "inventory" } },
+        { field: { Name: "image_urls" } }
+      ],
+      orderBy: [{ fieldName: "Name", sorttype: "ASC" }],
+      pagingInfo: { limit: 100, offset: 0 }
+    }
+    
+    const response = await apperClient.fetchRecords('product', params)
+    
+    if (!response.success) {
+      console.error(response.message)
+      throw new Error(response.message)
+    }
+    
+    return response.data || []
+  } catch (error) {
+    console.error('Error fetching products:', error)
+    throw error
+  }
 }
 
 export const getTemplates = async () => {
-  await delay()
-  return [...templates]
+  try {
+    await delay()
+    const apperClient = getApperClient()
+    
+    const params = {
+      fields: [
+        { field: { Name: "Name" } },
+        { field: { Name: "description" } },
+        { field: { Name: "category" } },
+        { field: { Name: "content" } },
+        { field: { Name: "llm_prompt" } }
+      ],
+      orderBy: [{ fieldName: "Name", sorttype: "ASC" }],
+      pagingInfo: { limit: 100, offset: 0 }
+    }
+    
+    const response = await apperClient.fetchRecords('template', params)
+    
+    if (!response.success) {
+      console.error(response.message)
+      throw new Error(response.message)
+    }
+    
+    return response.data || []
+  } catch (error) {
+    console.error('Error fetching templates:', error)
+    throw error
+  }
 }
 
 export const updateDescription = async (productId, description) => {
-  await delay()
-  const index = products.findIndex(p => p.Id === parseInt(productId))
-  if (index === -1) {
-    throw new Error('Product not found')
+  try {
+    await delay()
+    const apperClient = getApperClient()
+    
+    const filteredUpdates = {
+      Id: parseInt(productId),
+      description_html: description
+    }
+    
+    const params = { records: [filteredUpdates] }
+    const response = await apperClient.updateRecord('product', params)
+    
+    if (!response.success) {
+      console.error(response.message)
+      throw new Error(response.message)
+    }
+    
+    if (response.results) {
+      const successfulRecords = response.results.filter(result => result.success)
+      const failedRecords = response.results.filter(result => !result.success)
+      
+      if (failedRecords.length > 0) {
+        console.error(`Failed to update ${failedRecords.length} records:${JSON.stringify(failedRecords)}`)
+        throw new Error('Failed to update product description')
+      }
+      
+      return successfulRecords[0]?.data
+    }
+  } catch (error) {
+    console.error('Error updating description:', error)
+    throw error
   }
-  
-  products[index].description_html = description
-  return { ...products[index] }
 }
 
 export const createTemplate = async (templateData) => {
-  await delay()
-  const newTemplate = {
-    ...templateData,
-    Id: Math.max(...templates.map(t => t.Id)) + 1
+  try {
+    await delay()
+    const apperClient = getApperClient()
+    
+    const filteredData = {
+      Name: templateData.name || templateData.Name,
+      description: templateData.description,
+      category: templateData.category,
+      content: templateData.content,
+      llm_prompt: templateData.llm_prompt
+    }
+    
+    const params = { records: [filteredData] }
+    const response = await apperClient.createRecord('template', params)
+    
+    if (!response.success) {
+      console.error(response.message)
+      throw new Error(response.message)
+    }
+    
+    if (response.results) {
+      const successfulRecords = response.results.filter(result => result.success)
+      const failedRecords = response.results.filter(result => !result.success)
+      
+      if (failedRecords.length > 0) {
+        console.error(`Failed to create ${failedRecords.length} records:${JSON.stringify(failedRecords)}`)
+        throw new Error('Failed to create template')
+      }
+      
+      return successfulRecords[0]?.data
+    }
+  } catch (error) {
+    console.error('Error creating template:', error)
+    throw error
   }
-  templates.push(newTemplate)
-  return { ...newTemplate }
 }
 
 export const updateTemplate = async (templateId, updates) => {
-  await delay()
-  const index = templates.findIndex(t => t.Id === parseInt(templateId))
-  if (index === -1) {
-    throw new Error('Template not found')
+  try {
+    await delay()
+    const apperClient = getApperClient()
+    
+    const filteredUpdates = {
+      Id: parseInt(templateId),
+      ...(updates.name && { Name: updates.name }),
+      ...(updates.Name && { Name: updates.Name }),
+      ...(updates.description !== undefined && { description: updates.description }),
+      ...(updates.category && { category: updates.category }),
+      ...(updates.content !== undefined && { content: updates.content }),
+      ...(updates.llm_prompt !== undefined && { llm_prompt: updates.llm_prompt })
+    }
+    
+    const params = { records: [filteredUpdates] }
+    const response = await apperClient.updateRecord('template', params)
+    
+    if (!response.success) {
+      console.error(response.message)
+      throw new Error(response.message)
+    }
+    
+    if (response.results) {
+      const successfulRecords = response.results.filter(result => result.success)
+      const failedRecords = response.results.filter(result => !result.success)
+      
+      if (failedRecords.length > 0) {
+        console.error(`Failed to update ${failedRecords.length} records:${JSON.stringify(failedRecords)}`)
+        throw new Error('Failed to update template')
+      }
+      
+      return successfulRecords[0]?.data
+    }
+  } catch (error) {
+    console.error('Error updating template:', error)
+    throw error
   }
-  
-  templates[index] = { ...templates[index], ...updates }
-  return { ...templates[index] }
 }
 
 export const deleteTemplate = async (templateId) => {
-  await delay()
-  const index = templates.findIndex(t => t.Id === parseInt(templateId))
-  if (index === -1) {
-    throw new Error('Template not found')
+  try {
+    await delay()
+    const apperClient = getApperClient()
+    
+    const params = { RecordIds: [parseInt(templateId)] }
+    const response = await apperClient.deleteRecord('template', params)
+    
+    if (!response.success) {
+      console.error(response.message)
+      throw new Error(response.message)
+    }
+    
+    return { success: true }
+  } catch (error) {
+    console.error('Error deleting template:', error)
+    throw error
   }
-  
-  templates.splice(index, 1)
-return { success: true }
 }
 
 export const generateDescription = async ({ product, template, customPrompt, provider, settings }) => {
@@ -202,8 +276,8 @@ const extractProductImages = (product) => {
   // Simulate vendor image extraction (placeholder for real implementation)
   if (images.length === 0) {
     images.push(
-      `https://images.unsplash.com/800x600/?${product.name?.toLowerCase().replace(/\s+/g, ',')}`,
-      `https://images.unsplash.com/400x400/?${product.name?.toLowerCase().replace(/\s+/g, ',')}`,
+      `https://images.unsplash.com/800x600/?${product.Name?.toLowerCase().replace(/\s+/g, ',')}`,
+      `https://images.unsplash.com/400x400/?${product.Name?.toLowerCase().replace(/\s+/g, ',')}`,
     )
   }
   
@@ -212,13 +286,13 @@ const extractProductImages = (product) => {
 
 const enhancePromptWithProductData = (basePrompt, product, images) => {
   let enhancedPrompt = basePrompt
-    .replace(/\[PRODUCT_NAME\]/g, product.name || 'this product')
+    .replace(/\[PRODUCT_NAME\]/g, product.Name || 'this product')
     .replace(/\[PRODUCT_FEATURES\]/g, generateProductFeatures(product))
     .replace(/\[IMAGES\]/g, images.length > 0 ? `Product images available: ${images.join(', ')}` : 'No product images available')
   
   // Add product context
   enhancedPrompt += `\n\nProduct Details:
-- Name: ${product.name}
+- Name: ${product.Name}
 - Price: $${product.price}
 - MSRP: $${product.msrp}
 - Current Description: ${product.description_html ? convert(product.description_html, { wordwrap: false }) : 'No description'}
