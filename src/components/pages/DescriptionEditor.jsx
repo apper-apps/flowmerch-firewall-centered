@@ -19,6 +19,18 @@ const DescriptionEditor = () => {
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
   
+  // LLM Generation State
+  const [llmProvider, setLlmProvider] = useState('openrouter')
+  const [llmSettings, setLlmSettings] = useState({
+    apiKey: '',
+    model: 'openai/gpt-4o-mini',
+    temperature: 0.7,
+    maxTokens: 2000
+  })
+  const [customPrompt, setCustomPrompt] = useState('')
+  const [generating, setGenerating] = useState(false)
+  const [generationHistory, setGenerationHistory] = useState([])
+  const [showLlmPanel, setShowLlmPanel] = useState(false)
   useEffect(() => {
     loadData()
   }, [])
@@ -46,12 +58,52 @@ const DescriptionEditor = () => {
     setContent(product.description_html || '')
   }
   
-  const applyTemplate = (template) => {
+const applyTemplate = (template) => {
     setSelectedTemplate(template)
     setContent(template.content)
+    setCustomPrompt(template.llm_prompt || '')
     toast.success('Template applied')
   }
   
+  const generateWithLLM = async () => {
+    if (!selectedProduct || !llmSettings.apiKey) {
+      toast.error('Please select a product and configure LLM settings')
+      return
+    }
+    
+    try {
+      setGenerating(true)
+      const generatedContent = await descriptionService.generateDescription({
+        product: selectedProduct,
+        template: selectedTemplate,
+        customPrompt,
+        provider: llmProvider,
+        settings: llmSettings
+      })
+      
+      setContent(generatedContent.html)
+      setGenerationHistory(prev => [{
+        id: Date.now(),
+        content: generatedContent.html,
+        timestamp: new Date(),
+        prompt: customPrompt || generatedContent.prompt,
+        provider: llmProvider
+      }, ...prev.slice(0, 4)]) // Keep last 5 generations
+      
+      toast.success('Description generated successfully!')
+    } catch (err) {
+      toast.error('Failed to generate description: ' + err.message)
+      console.error('LLM generation error:', err)
+    } finally {
+      setGenerating(false)
+    }
+  }
+  
+  const loadHistoryItem = (item) => {
+    setContent(item.content)
+    setCustomPrompt(item.prompt)
+    toast.success('Previous generation loaded')
+  }
   const saveDescription = async () => {
     if (!selectedProduct) return
     
@@ -85,8 +137,7 @@ const DescriptionEditor = () => {
         <p className="text-gray-600">Create and edit rich HTML descriptions for your products</p>
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        
+<div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
         {/* Product List */}
         <div className="card">
           <div className="p-4 border-b border-gray-200">
@@ -108,21 +159,32 @@ const DescriptionEditor = () => {
           </div>
         </div>
         
-        {/* Editor */}
-        <div className="lg:col-span-2">
+{/* Editor */}
+        <div className="xl:col-span-2">
           <div className="card">
             {/* Editor Header */}
-            <div className="p-4 border-b border-gray-200">
+<div className="p-4 border-b border-gray-200">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-semibold text-gray-900">
                   {selectedProduct ? selectedProduct.name : 'Select a Product'}
                 </h2>
-                {selectedProduct && (
-                  <Button onClick={saveDescription} loading={saving}>
-                    <ApperIcon name="Save" className="h-4 w-4 mr-2" />
-                    Save
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setShowLlmPanel(!showLlmPanel)}
+                    className={showLlmPanel ? 'bg-primary/10 text-primary' : ''}
+                  >
+                    <ApperIcon name="Bot" className="h-4 w-4 mr-2" />
+                    AI Generate
                   </Button>
-                )}
+                  {selectedProduct && (
+                    <Button onClick={saveDescription} loading={saving}>
+                      <ApperIcon name="Save" className="h-4 w-4 mr-2" />
+                      Save
+                    </Button>
+                  )}
+                </div>
               </div>
               
               {/* Editor Mode Tabs */}
@@ -230,7 +292,158 @@ const DescriptionEditor = () => {
               </motion.div>
             ))}
           </div>
-        </div>
+</div>
+        
+        {/* LLM Generation Panel */}
+        {showLlmPanel && (
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="xl:col-span-2 space-y-6"
+          >
+            {/* LLM Settings */}
+            <div className="card">
+              <div className="p-4 border-b border-gray-200">
+                <h2 className="font-semibold text-gray-900 flex items-center">
+                  <ApperIcon name="Settings" className="h-5 w-5 mr-2" />
+                  LLM Configuration
+                </h2>
+              </div>
+              <div className="p-4 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Provider</label>
+                  <select
+                    value={llmProvider}
+                    onChange={(e) => setLlmProvider(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg"
+                  >
+                    <option value="openrouter">OpenRouter</option>
+                    <option value="openai">OpenAI (ChatGPT)</option>
+                    <option value="anthropic">Anthropic (Claude)</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">API Key</label>
+                  <Input
+                    type="password"
+                    value={llmSettings.apiKey}
+                    onChange={(e) => setLlmSettings(prev => ({ ...prev, apiKey: e.target.value }))}
+                    placeholder="Enter your API key"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Model</label>
+                    <select
+                      value={llmSettings.model}
+                      onChange={(e) => setLlmSettings(prev => ({ ...prev, model: e.target.value }))}
+                      className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                    >
+                      {llmProvider === 'openrouter' && (
+                        <>
+                          <option value="openai/gpt-4o-mini">GPT-4O Mini</option>
+                          <option value="openai/gpt-4o">GPT-4O</option>
+                          <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+                          <option value="anthropic/claude-3-haiku">Claude 3 Haiku</option>
+                        </>
+                      )}
+                      {llmProvider === 'openai' && (
+                        <>
+                          <option value="gpt-4o-mini">GPT-4O Mini</option>
+                          <option value="gpt-4o">GPT-4O</option>
+                          <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                        </>
+                      )}
+                      {llmProvider === 'anthropic' && (
+                        <>
+                          <option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
+                          <option value="claude-3-haiku-20240307">Claude 3 Haiku</option>
+                        </>
+                      )}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Temperature</label>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="1"
+                      step="0.1"
+                      value={llmSettings.temperature}
+                      onChange={(e) => setLlmSettings(prev => ({ ...prev, temperature: parseFloat(e.target.value) }))}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Custom Prompt */}
+            <div className="card">
+              <div className="p-4 border-b border-gray-200">
+                <h3 className="font-semibold text-gray-900 flex items-center">
+                  <ApperIcon name="MessageSquare" className="h-5 w-5 mr-2" />
+                  Custom Prompt
+                </h3>
+              </div>
+              <div className="p-4">
+                <textarea
+                  value={customPrompt}
+                  onChange={(e) => setCustomPrompt(e.target.value)}
+                  className="w-full h-32 p-3 border border-gray-300 rounded-lg resize-none"
+                  placeholder="Enter custom instructions for the LLM (optional). Use [PRODUCT_NAME], [PRODUCT_FEATURES], [IMAGES] as placeholders."
+                />
+                <div className="mt-3 flex justify-between items-center">
+                  <p className="text-sm text-gray-500">
+                    Variables: [PRODUCT_NAME], [PRODUCT_FEATURES], [IMAGES]
+                  </p>
+                  <Button 
+                    onClick={generateWithLLM} 
+                    loading={generating}
+                    disabled={!selectedProduct || !llmSettings.apiKey}
+                  >
+                    <ApperIcon name="Sparkles" className="h-4 w-4 mr-2" />
+                    Generate Description
+                  </Button>
+                </div>
+              </div>
+            </div>
+            
+            {/* Generation History */}
+            {generationHistory.length > 0 && (
+              <div className="card">
+                <div className="p-4 border-b border-gray-200">
+                  <h3 className="font-semibold text-gray-900 flex items-center">
+                    <ApperIcon name="History" className="h-5 w-5 mr-2" />
+                    Generation History
+                  </h3>
+                </div>
+                <div className="p-4 space-y-3 max-h-96 overflow-y-auto">
+                  {generationHistory.map((item) => (
+                    <motion.div
+                      key={item.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-3 border border-gray-200 rounded-lg hover:border-primary/30 cursor-pointer transition-colors"
+                      onClick={() => loadHistoryItem(item)}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <span className="text-xs text-gray-500">
+                          {item.timestamp.toLocaleTimeString()} - {item.provider}
+                        </span>
+                        <ApperIcon name="RotateCcw" className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <p className="text-sm text-gray-700 line-clamp-3" 
+                         dangerouslySetInnerHTML={{ __html: item.content.substring(0, 150) + '...' }}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </motion.div>
+        )}
       </div>
     </div>
   )

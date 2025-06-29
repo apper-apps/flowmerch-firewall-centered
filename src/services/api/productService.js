@@ -11,9 +11,14 @@ const mockProducts = [
     price: 149.99,
     inventory: 45,
     last_synced: '2024-01-15T10:30:00Z',
-    sync_status: 'synced'
+    sync_status: 'synced',
+    image_urls: [
+      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400&h=400&fit=crop',
+      'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=600&h=400&fit=crop'
+    ]
   },
-  {
+{
     Id: 2,
     shopify_id: 'prod_987654321',
     name: 'Smart Fitness Watch',
@@ -23,9 +28,13 @@ const mockProducts = [
     price: 249.99,
     inventory: 8,
     last_synced: '2024-01-15T09:45:00Z',
-    sync_status: 'conflict'
+    sync_status: 'conflict',
+    image_urls: [
+      'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=400&h=400&fit=crop'
+    ]
   },
-  {
+{
     Id: 3,
     shopify_id: 'prod_456789123',
     name: 'Portable Power Bank',
@@ -34,10 +43,14 @@ const mockProducts = [
     cost: 35.00,
     price: 59.99,
     inventory: 123,
-    last_synced: '2024-01-15T11:15:00Z',
-    sync_status: 'synced'
+    last_synced: '1/15/2024 11:15:00 AMZ',
+    sync_status: 'synced',
+    image_urls: [
+      'https://images.unsplash.com/photo-1609592020508-9e54b0c4b30b?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1552702042-f8fd29f0e4b8?w=400&h=400&fit=crop'
+    ]
   },
-  {
+{
     Id: 4,
     shopify_id: 'prod_789123456',
     name: 'Wireless Charging Pad',
@@ -47,9 +60,12 @@ const mockProducts = [
     price: 39.99,
     inventory: 67,
     last_synced: null,
-    sync_status: 'pending'
+    sync_status: 'pending',
+    image_urls: [
+      'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=800&h=600&fit=crop'
+    ]
   },
-  {
+{
     Id: 5,
     shopify_id: 'prod_321654987',
     name: 'Bluetooth Speaker',
@@ -59,9 +75,13 @@ const mockProducts = [
     price: 99.99,
     inventory: 2,
     last_synced: '2024-01-15T08:20:00Z',
-    sync_status: 'error'
+    sync_status: 'error',
+    image_urls: [
+      'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1545454675-3531b543be5d?w=400&h=400&fit=crop'
+    ]
   },
-  {
+{
     Id: 6,
     shopify_id: 'prod_654987321',
     name: 'USB-C Hub',
@@ -71,7 +91,10 @@ const mockProducts = [
     price: 69.99,
     inventory: 89,
     last_synced: '2024-01-15T10:45:00Z',
-    sync_status: 'synced'
+    sync_status: 'synced',
+    image_urls: [
+      'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=800&h=600&fit=crop'
+    ]
   }
 ]
 
