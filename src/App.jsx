@@ -8,6 +8,7 @@ import DescriptionEditor from '@/components/pages/DescriptionEditor'
 import WidgetBuilder from '@/components/pages/WidgetBuilder'
 import BundleManager from '@/components/pages/BundleManager'
 import Collections from '@/components/pages/Collections'
+import TemplateEditor from '@/components/pages/TemplateEditor'
 import Settings from '@/components/pages/Settings'
 
 function App() {
@@ -19,10 +20,11 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/products" element={<Products />} />
             <Route path="/sync" element={<SyncManager />} />
-            <Route path="/descriptions" element={<DescriptionEditor />} />
+<Route path="/descriptions" element={<DescriptionEditor />} />
             <Route path="/widgets" element={<WidgetBuilder />} />
             <Route path="/bundles" element={<BundleManager />} />
             <Route path="/collections" element={<Collections />} />
+            <Route path="/templates" element={<TemplateEditor />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>
         </Layout>

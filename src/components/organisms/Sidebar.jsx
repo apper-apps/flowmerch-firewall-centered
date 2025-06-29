@@ -11,8 +11,9 @@ const Sidebar = ({ isCollapsed = false }) => {
     { name: 'Sync Manager', path: '/sync', icon: 'RefreshCw' },
     { name: 'Descriptions', path: '/descriptions', icon: 'FileText' },
     { name: 'Widgets', path: '/widgets', icon: 'Zap' },
-    { name: 'Bundles', path: '/bundles', icon: 'Layers' },
+{ name: 'Bundles', path: '/bundles', icon: 'Layers' },
     { name: 'Collections', path: '/collections', icon: 'FolderOpen' },
+    { name: 'Templates', path: '/templates', icon: 'FileEdit' },
     { name: 'Settings', path: '/settings', icon: 'Settings' }
   ]
   
