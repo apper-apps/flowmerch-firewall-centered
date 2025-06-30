@@ -30,9 +30,9 @@ export const getSettings = async () => {
     
     const response = await apperClient.fetchRecords('settings', params)
     
-    if (!response.success) {
-      console.error(response.message)
-      throw new Error(response.message)
+if (!response.success) {
+      console.error(response.message);
+      throw new Error(response.message);
     }
     
     // If no settings exist, return default structure
@@ -129,9 +129,9 @@ export const updateSettings = async (section, updates) => {
       response = await apperClient.updateRecord('settings', params)
     }
     
-    if (!response.success) {
-      console.error(response.message)
-      throw new Error(response.message)
+if (!response.success) {
+      console.error(response.message);
+      throw new Error(response.message);
     }
     
     return currentSettings
