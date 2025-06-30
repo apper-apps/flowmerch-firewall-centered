@@ -8,12 +8,24 @@ function Login() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const { isInitialized } = useContext(AuthContext)
-  
-  useEffect(() => {
+useEffect(() => {
     if (isInitialized) {
+      // Suppress ResizeObserver errors that can occur with ApperUI
+      const resizeObserverErrorHandler = (e) => {
+        if (e.message === 'ResizeObserver loop completed with undelivered notifications.') {
+          return true
+        }
+      }
+      
+      window.addEventListener('error', resizeObserverErrorHandler)
+      
       // Show login UI in this component
       const { ApperUI } = window.ApperSDK
       ApperUI.showLogin("#authentication")
+      
+      return () => {
+        window.removeEventListener('error', resizeObserverErrorHandler)
+      }
     }
   }, [isInitialized])
   
