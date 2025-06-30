@@ -9,11 +9,29 @@ function Signup() {
   const dispatch = useDispatch()
   const { isInitialized } = useContext(AuthContext)
   
-  useEffect(() => {
+useEffect(() => {
     if (isInitialized) {
-      // Show signup UI in this component
-      const { ApperUI } = window.ApperSDK
-      ApperUI.showSignup("#authentication")
+      try {
+        // Show signup UI in this component
+        const { ApperUI } = window.ApperSDK
+        ApperUI.showSignup("#authentication")
+        
+        // Suppress ResizeObserver errors
+        const originalError = console.error
+        console.error = (...args) => {
+          if (args[0]?.includes?.('ResizeObserver loop completed with undelivered notifications')) {
+            return // Suppress this specific error
+          }
+          originalError.apply(console, args)
+        }
+        
+        return () => {
+          // Cleanup: restore original console.error
+          console.error = originalError
+        }
+      } catch (error) {
+        console.warn('ApperUI initialization error:', error)
+      }
     }
   }, [isInitialized])
   
